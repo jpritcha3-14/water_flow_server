@@ -3,13 +3,18 @@ import time
 from subprocess import Popen, PIPE
 
 child = Popen(['python3', 'db_writer_child.py'], stdin=PIPE)
-#screen = Popen(['python3', 'screen_count.py'])
 
-def gpio_callback(callbackCount=[0], child=child):
+def gpio_callback(callbackCount=[0], lastUpdate=[time.time()], child=child):
     callbackCount[0] += 1 
+    curTime = time.time()
     print("GPIO_CALLBACK! Count:", callbackCount[0])
-    if callbackCount[0] % 10 == 0:
-        child.stdin.write(bytes(str(callbackCount[0]), 'utf-8') + b'\n')
+    delta = curTime - lastUpdate[0]
+    if delta >= 5:
+        curFlow = 0.02592313*callbackCount[0] - 0.2476755
+        curFlow = round(curFlow, 2)
+        lastUpdate[0] = time.time()
+        callbackCount[0] = 0
+        child.stdin.write(bytes(str(curFlow), 'utf-8') + b'\n')
         child.stdin.flush()
 
 PIN_TO_SENSE = 18
