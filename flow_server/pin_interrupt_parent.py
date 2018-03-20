@@ -1,14 +1,16 @@
 import wiringpi
 import time
-import subprocess
+from subprocess import Popen, PIPE
 
-print('running pin interrupt parent')
+child = Popen(['python3', 'db_writer_child.py'], stdin=PIPE)
+#screen = Popen(['python3', 'screen_count.py'])
 
-def gpio_callback(callbackCount=[0]):
+def gpio_callback(callbackCount=[0], child=child):
     callbackCount[0] += 1 
     print("GPIO_CALLBACK! Count:", callbackCount[0])
-    if callbackCount[0] % 1000 == 0:
-        subprocess.Popen(['python3','manage.py','db_writer_child', str(callbackCount[0])])
+    if callbackCount[0] % 10 == 0:
+        child.stdin.write(bytes(str(callbackCount[0]), 'utf-8') + b'\n')
+        child.stdin.flush()
 
 PIN_TO_SENSE = 18
 wiringpi.wiringPiSetupGpio()

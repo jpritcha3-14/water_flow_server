@@ -1,0 +1,6 @@
+BEGIN;
+--
+-- Create model Flow
+--
+CREATE TABLE "display_flow_flow" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "val" integer NOT NULL, "timestamp" integer NOT NULL);
+COMMIT;

@@ -84,7 +84,7 @@ draw = ImageDraw.Draw(image)
 
 # Animate text moving in sine wave.
 print('Press Ctrl-C to quit.')
-conn = sqlite3.connect('example.db')
+conn = sqlite3.connect('db.sqlite3')
 c = conn.cursor()
 
 def closeAndClear(conn=conn, draw=draw):
@@ -99,7 +99,7 @@ while True:
     # Enumerate characters and draw them offset vertically based on a sine wave.
      
     with conn:
-        c.execute('SELECT c FROM count WHERE id = 1;')
+        c.execute('SELECT val FROM display_flow_flow WHERE timestamp = (SELECT MAX(timestamp) FROM display_flow_flow);')
         count = c.fetchall()[0][0]
 
     x = 0
