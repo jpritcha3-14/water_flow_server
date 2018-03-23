@@ -1,3 +1,4 @@
 index.html
 example.db
 db.sqlite3
+*.pyc
