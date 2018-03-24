@@ -3,17 +3,31 @@ import time
 from subprocess import Popen, PIPE
 
 child = Popen(['python3', 'db_writer_child.py'], stdin=PIPE)
+count = 0 
+recordedZero = False
+lastUpdate = time.time()
 
-def gpio_callback(callbackCount=[0], lastUpdate=[time.time()], child=child):
-    callbackCount[0] += 1 
+def gpio_callback():
+    global count 
+    global lastUpdate
+    global recordedZero
+    count += 1
     curTime = time.time()
-    print("GPIO_CALLBACK! Count:", callbackCount[0])
-    delta = curTime - lastUpdate[0]
+    print("GPIO_CALLBACK! Count:", count)
+    delta = curTime - lastUpdate
+
+    # If flow is just starting up, reset timing
+    if delta >= 5 and count == 1:
+        lastUpdate = time.time()
+        delta = 0
+
+    
     if delta >= 5:
-        curFlow = 0.02592313*callbackCount[0] - 0.2476755
+        curFlow = 0.02592313*count - 0.2476755
         curFlow = round(curFlow, 2)
-        lastUpdate[0] = time.time()
-        callbackCount[0] = 0
+        lastUpdate = time.time()
+        count = 0
+        recordedZero = False
         child.stdin.write(bytes(str(curFlow), 'utf-8') + b'\n')
         child.stdin.flush()
 
@@ -23,8 +37,12 @@ wiringpi.pinMode(PIN_TO_SENSE, wiringpi.GPIO.INPUT)
 wiringpi.pullUpDnControl(PIN_TO_SENSE, wiringpi.GPIO.PUD_DOWN)
 
 wiringpi.wiringPiISR(PIN_TO_SENSE, wiringpi.GPIO.INT_EDGE_RISING, gpio_callback)
+print('GPIO Setup Complete')
 
-print('setup complete')
 while True:
-    wiringpi.delay(2000)
-
+    wiringpi.delay(5000)
+    if time.time() - lastUpdate >= 5 and not recordedZero:
+        child.stdin.write(bytes('0.00', 'utf-8') + b'\n')
+        child.stdin.flush()
+        recordedZero = True
+        count = 0
