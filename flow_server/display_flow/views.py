@@ -1,4 +1,6 @@
 import time
+import io
+import base64
 import datetime
 import pytz
 import random
@@ -42,31 +44,42 @@ def createGraph(data, period, dateFormat):
     fig.autofmt_xdate()
 
     canvas = FigureCanvas(fig)
+
     response = HttpResponse(content_type='image/png')
     canvas.print_png(response)
-
     return response
 
-def index(request):
-    template = loader.get_template('display_flow/index.html')
+def current(request):
     latest = Flow.objects.latest('timestamp')
-    context = {'latest_flow': latest.val}
-    return HttpResponse(template.render(context, request))
+    return render(request, 'display_flow/current.html', {'latest_flow':latest.val})
 
 def minute(request):
+    return render(request, 'display_flow/minute.html')
+
+def minute_image(request):
     past_minute = Flow.objects.filter(timestamp__gt=int(time.time())-60)
     return createGraph(past_minute, 'Minute', '%H:%M:%S')
 
 def hour(request):
+    return render(request, 'display_flow/hour.html')
+
+def hour_image(request):
     past_hour = Flow.objects.filter(timestamp__gt=int(time.time())-3600)
     return createGraph(past_hour, 'Hour', '%H:%M:%S')
 
 def day(request):
+    return render(request, 'display_flow/day.html')
+
+def day_image(request):
     past_day = Flow.objects.filter(timestamp__gt=int(time.time())-3600*24)
     return createGraph(past_day, 'Day', '%a-%H')
 
 def week(request):
-    return HttpResponse("This is where we show the flow for the last week")
+    return render(request, 'display_flow/week.html')
+
+def week_image(request):
+    past_week = Flow.objects.filter(timestamp__gt=int(time.time())-3600*24*7)
+    return createGraph(past_week, 'Week', '%a-%H')
 
 def test(request):
     fig = Figure()

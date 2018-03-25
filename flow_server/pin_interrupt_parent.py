@@ -20,7 +20,6 @@ def gpio_callback():
     if delta >= 5 and count == 1:
         lastUpdate = time.time()
         delta = 0
-
     
     if delta >= 5:
         curFlow = 0.02592313*count - 0.2476755
@@ -41,8 +40,10 @@ print('GPIO Setup Complete')
 
 while True:
     wiringpi.delay(5000)
-    if time.time() - lastUpdate >= 5 and not recordedZero:
+    if (time.time() - lastUpdate >= 5 and not recordedZero
+        or time.time() - lastUpdate >= 60 and recordedZero):
         child.stdin.write(bytes('0.00', 'utf-8') + b'\n')
         child.stdin.flush()
         recordedZero = True
+        lastUpdate = time.time()
         count = 0
