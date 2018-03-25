@@ -74,7 +74,7 @@ disp.display()
 image = Image.new('1', (width, height))
 
 # Load default font.
-font = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf", 25)
+font = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf", 15)
 # Alternatively load a TTF font.  Make sure the .ttf font file is in the same directory as this python script!
 # Some nice fonts to try: http://www.dafont.com/bitmap.php
 # font = ImageFont.truetype('Minecraftia.ttf', 8)
@@ -93,6 +93,17 @@ def closeAndClear(conn=conn, draw=draw):
 
 atexit.register(closeAndClear, conn)
 
+def drawLine(x, y, text):
+    for ch in text:
+        # Stop drawing if off the right side of screen.
+        if x > width:
+            return
+        # Draw text.
+        draw.text((x, y), ch, font=font, fill=255)
+        # Increment x position based on chacacter width.
+        char_width, char_height = draw.textsize(ch, font=font)
+        x += char_width
+
 while True:
     # Clear image buffer by drawing a black filled box.
     draw.rectangle((0,0,width,height), outline=0, fill=0)
@@ -102,23 +113,16 @@ while True:
         c.execute('SELECT val FROM display_flow_flow WHERE timestamp = (SELECT MAX(timestamp) FROM display_flow_flow);')
         count = c.fetchall()[0][0]
 
-    x = 0
-    for ch in str(count):
-        # Stop drawing if off the right side of screen.
-        if x > width:
-            break
-        # Calculate offset from sine wave.
-        y = 20 
-        # Draw text.
-        draw.text((x, y), ch, font=font, fill=255)
-        # Increment x position based on chacacter width.
-        char_width, char_height = draw.textsize(ch, font=font)
-        x += char_width
+    drawLine(0,0,'Flow Rate:') 
+    drawLine(0,15,str(count) + ' L/Min') 
+    drawLine(0,30,'Max Flow Rate:') 
+    drawLine(0,45,'Placeholder') 
+    
     # Draw the image buffer.
     disp.image(image)
     disp.display()
     count += 1
     # Pause briefly before drawing next frame.
-    time.sleep(1)
+    time.sleep(2)
 
 

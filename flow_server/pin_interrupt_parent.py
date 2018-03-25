@@ -30,12 +30,20 @@ def gpio_callback():
         child.stdin.write(bytes(str(curFlow), 'utf-8') + b'\n')
         child.stdin.flush()
 
-PIN_TO_SENSE = 18
-wiringpi.wiringPiSetupGpio()
-wiringpi.pinMode(PIN_TO_SENSE, wiringpi.GPIO.INPUT)
-wiringpi.pullUpDnControl(PIN_TO_SENSE, wiringpi.GPIO.PUD_DOWN)
+PIN_TO_SENSE1 = 18
+PIN_TO_SENSE2 = 23
 
-wiringpi.wiringPiISR(PIN_TO_SENSE, wiringpi.GPIO.INT_EDGE_RISING, gpio_callback)
+wiringpi.wiringPiSetupGpio()
+
+wiringpi.pinMode(PIN_TO_SENSE1, wiringpi.GPIO.INPUT)
+wiringpi.pinMode(PIN_TO_SENSE2, wiringpi.GPIO.INPUT)
+
+wiringpi.pullUpDnControl(PIN_TO_SENSE1, wiringpi.GPIO.PUD_DOWN)
+wiringpi.pullUpDnControl(PIN_TO_SENSE2, wiringpi.GPIO.PUD_DOWN)
+
+wiringpi.wiringPiISR(PIN_TO_SENSE1, wiringpi.GPIO.INT_EDGE_RISING, gpio_callback)
+wiringpi.wiringPiISR(PIN_TO_SENSE2, wiringpi.GPIO.INT_EDGE_RISING, gpio_callback)
+
 print('GPIO Setup Complete')
 
 while True:
