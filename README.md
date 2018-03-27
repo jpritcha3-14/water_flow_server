@@ -13,53 +13,9 @@
 ## Wiring Setup
 ### (Box = Component, Circle = Connection Point)
 
-```mermaid
-graph LR
-    RPi(RPi) -- GPIO --- RPi_Hat(Rpi Hat)
-```
-```mermaid
-graph LR
-    RPi_Hat(RPi Hat) --- 3.3V((3.3V))
-    RPi_Hat --- 5V((5V))
-    RPi_Hat --- 18((18))
-    RPi_Hat --- 23((23))
-    5V --- HV((HV))
-    3.3V --- LV((LV))
-    HV --- level_shifter(Level Shifter)
-    LV --- level_shifter
-    18 --- LV1((LV1))
-    23 --- LV2((LV2))
-    LV1 --- level_shifter
-    LV2 --- level_shifter 
-```
-```mermaid
-graph LR
-    level_shifter(Level Shifter) --- HV1((HV1/2))
-    HV1 --- yellow1((Yellow))
-    yellow1 --- flow1(Flow Sensor 1/2)
-    RPi_Hat(RPi Hat) --- gnd((GND))
-    RPi_Hat --- 5V((5V))
-    gnd --- black1((Black))
-    5V --- red1((Red))
-    black1 --- flow1
-    red1 --- flow1
-```
-```mermaid
-graph LR
-    RPi_Hat(RPi Hat) --- 3.3V((3.3V))
-    RPi_Hat --- SCL1((SCL))
-    RPi_Hat --- SDA1((SDA))
-    RPi_Hat --- GND1((GND))
- 
-    3.3V --- VCC((VCC))
-    VCC --- OLED(OLED)
-    SCL1 --- SCL2((SCL))
-    SDA1 --- SDA2((SDA))
-    SCL2 --- OLED
-    SDA2 --- OLED
-    GND1 --- GND2((GND))
-    GND2 --- OLED
-```
+![alt text](https://raw.githubusercontent.com/jpritcha3-14/water_flow_server/master/images/diagram_1.jpg "Board to level shifter")
+![alt text](https://raw.githubusercontent.com/jpritcha3-14/water_flow_server/master/images/diagram_2.jpg "Level shifter to sensors")
+![alt text](https://raw.githubusercontent.com/jpritcha3-14/water_flow_server/master/images/diagram_3.jpg "Board to OLED")
 
 ## Completed Hardware Setup
 
