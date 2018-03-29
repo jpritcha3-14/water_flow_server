@@ -1,5 +1,6 @@
 # Copyright (c) 2014 Adafruit Industries
 # Author: Tony DiCola
+# Modified By: Jonathan Pritchard
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,12 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+
 import math
 import time
 import sqlite3
 import atexit
 
-import Adafruit_GPIO.SPI as SPI
 import Adafruit_SSD1306
 
 from PIL import Image
@@ -34,9 +35,9 @@ from PIL import ImageDraw
 # Raspberry Pi pin configuration:
 RST = 24
 # Note the following are only used with SPI:
-DC = 23
-SPI_PORT = 0
-SPI_DEVICE = 0
+# DC = 23
+# SPI_PORT = 0
+# SPI_DEVICE = 0
 
 
 # Beaglebone Black pin configuration:
@@ -47,7 +48,7 @@ SPI_DEVICE = 0
 # SPI_DEVICE = 0
 
 # 128x32 display with hardware I2C:
-#disp = Adafruit_SSD1306.SSD1306_128_32(rst=RST)
+# disp = Adafruit_SSD1306.SSD1306_128_32(rst=RST)
 
 # 128x64 display with hardware I2C:
 disp = Adafruit_SSD1306.SSD1306_128_64(rst=RST, i2c_address=0x3C)
@@ -82,8 +83,7 @@ font = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf",
 # Create drawing object.
 draw = ImageDraw.Draw(image)
 
-# Animate text moving in sine wave.
-print('Press Ctrl-C to quit.')
+print('OLED Display Initialized')
 conn = sqlite3.connect('db.sqlite3')
 c = conn.cursor()
 
@@ -107,22 +107,21 @@ def drawLine(x, y, text):
 while True:
     # Clear image buffer by drawing a black filled box.
     draw.rectangle((0,0,width,height), outline=0, fill=0)
-    # Enumerate characters and draw them offset vertically based on a sine wave.
      
     with conn:
         c.execute('SELECT val FROM display_flow_flow WHERE timestamp = (SELECT MAX(timestamp) FROM display_flow_flow);')
-        count = c.fetchall()[0][0]
-
-    drawLine(0,0,'Flow Rate:') 
-    drawLine(0,15,str(count) + ' L/Min') 
-    drawLine(0,30,'Max Flow Rate:') 
-    drawLine(0,45,'Placeholder') 
+        cur_flow = c.fetchall()[0][0]
+        c.execute('SELECT MAX(val) FROM display_flow_flow WHERE timestamp > (?);', (int(time.time() - 60),))
+        max_flow = c.fetchall()[0][0]
+        
+    drawLine(0, 0, 'Flow Rate:') 
+    drawLine(0, 15, str(cur_flow) + ' L/Min') 
+    drawLine(0, 30, 'Max Flow Rate:') 
+    drawLine(0, 45, (str(max_flow) if max_flow != None else '0') + ' L/Min') 
     
     # Draw the image buffer.
     disp.image(image)
     disp.display()
-    count += 1
-    # Pause briefly before drawing next frame.
+
+    # Pause before drawing next frame.
     time.sleep(2)
-
-
