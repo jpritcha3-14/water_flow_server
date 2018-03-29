@@ -1,7 +1,9 @@
 <img src={% url 'minute_image' %} alt="Flow rate over past minute"/>
+<h3>Maximum Flow Rate: {{val__max}} L/Min</h3>
 <p>View flow rate over past:</p>
 <ul>
     <li><a href={% url 'hour' %}>Hour</a></li>
     <li><a href={% url 'day' %}>Day</a></li>
     <li><a href={% url 'week' %}>Week</a></li>
 </ul>
+

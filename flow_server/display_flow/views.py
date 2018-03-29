@@ -11,6 +11,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 
+import django.db.models as models 
 from .models import Flow
 
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -49,33 +50,36 @@ def createGraph(data, period, dateFormat):
     canvas.print_png(response)
     return response
 
+def getMaxFlow(seconds):
+    return Flow.objects.filter(timestamp__gt=int(time.time())-seconds).aggregate(models.Max('val', output_field=models.FloatField()))
+
 def current(request):
     latest = Flow.objects.latest('timestamp')
     return render(request, 'display_flow/current.html', {'latest_flow':latest.val})
 
 def minute(request):
-    return render(request, 'display_flow/minute.html')
+    return render(request, 'display_flow/minute.html', getMaxFlow(60))
 
 def minute_image(request):
     past_minute = Flow.objects.filter(timestamp__gt=int(time.time())-60)
     return createGraph(past_minute, 'Minute', '%H:%M:%S')
 
 def hour(request):
-    return render(request, 'display_flow/hour.html')
+    return render(request, 'display_flow/hour.html', getMaxFlow(3600))
 
 def hour_image(request):
     past_hour = Flow.objects.filter(timestamp__gt=int(time.time())-3600)
     return createGraph(past_hour, 'Hour', '%H:%M:%S')
 
 def day(request):
-    return render(request, 'display_flow/day.html')
+    return render(request, 'display_flow/day.html', getMaxFlow(3600*24))
 
 def day_image(request):
     past_day = Flow.objects.filter(timestamp__gt=int(time.time())-3600*24)
     return createGraph(past_day, 'Day', '%a-%H')
 
 def week(request):
-    return render(request, 'display_flow/week.html')
+    return render(request, 'display_flow/week.html', getMaxFlow(3600*24*7))
 
 def week_image(request):
     past_week = Flow.objects.filter(timestamp__gt=int(time.time())-3600*24*7)
