@@ -13,9 +13,9 @@
 ## Wiring Setup
 ### (Box = Component, Circle = Connection Point)
 
-![alt text](https://raw.githubusercontent.com/jpritcha3-14/water_flow_server/master/images/diagram_1.jpg "Board to level shifter")
-![alt text](https://raw.githubusercontent.com/jpritcha3-14/water_flow_server/master/images/diagram_2.jpg "Level shifter to sensors")
-![alt text](https://raw.githubusercontent.com/jpritcha3-14/water_flow_server/master/images/diagram_3.jpg "Board to OLED")
+![alt text](https://raw.githubusercontent.com/jpritcha3-14/water_flow_server/master/images/diagram_1.png "Board to level shifter")
+![alt text](https://raw.githubusercontent.com/jpritcha3-14/water_flow_server/master/images/diagram_2.png "Level shifter to sensors")
+![alt text](https://raw.githubusercontent.com/jpritcha3-14/water_flow_server/master/images/diagram_3.png "Board to OLED")
 
 ## Completed Hardware Setup
 
@@ -39,6 +39,17 @@
     $ python3 spinUp.py
     ```
 ## Example Server Response
-http://[ip_address]:[port]/display_flow/hour/
+http://[ip_address]:[port]/display_flow/minute/
 
-![alt text](https://raw.githubusercontent.com/jpritcha3-14/water_flow_server/master/images/flow_past_hour.jpg "Server Response Example")
+![alt text](https://raw.githubusercontent.com/jpritcha3-14/water_flow_server/master/images/flow_past_minute.png "Server Response Example")
+
+## Current Features
+* Main process measures and records flow data from one or two flow sensors
+* Main process pushes data to a child process for database logging every 5 seconds
+* Separate process updates the OLED with current flow rate and maximum flow rate
+* Web sever displays current flow rate, as well as dynamically generated graphs for historical flow rates (for past minute, hour, day, and week) and the maximum flow rate over the selected interval
+
+## Planned Features
+* Allow custom settings for flow rate parameters through web server
+* Create an alert if flow goes over a threshold value (set via web server)
+* Pretty up the web interface

@@ -7,6 +7,9 @@ count = 0
 recordedZero = False
 lastUpdate = time.time()
 
+child.stdin.write(bytes('0.00', 'utf-8') + b'\n')
+child.stdin.flush()
+
 def gpio_callback():
     global count 
     global lastUpdate
